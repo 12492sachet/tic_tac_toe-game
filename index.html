@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tic Tac Toe </title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            background-color: #1F2937;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            font-size: 40px;
+            color: white;
+            margin: 20px 0;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-gap: 10px;
+            margin: 20px auto;
+        }
+
+        .cell {
+            width: 100px;
+            height: 100px;
+            font-size: 48px;
+            text-align: center;
+            vertical-align: middle;
+            border: 2px solid #333;
+            cursor: pointer;
+            background-color: #ddd;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .cell:hover {
+            background-color: #ccc;
+        }
+
+        .cell.X {
+            color: #FF5722;
+        }
+
+        .cell.O {
+            color: #1976D2;
+        }
+
+        #winner {
+            font-size: 24px;
+            color: #fff;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        #resetButton {
+            background-color: black;
+            color: #F9FAF8;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+            border-radius: 5px;
+            height: 80px;
+            width: 200px;
+        }
+
+        #resetButton:hover {
+            background-color: rgb(0, 225, 255);
+        }
+
+        footer {
+            position: relative;
+            width: 100%;
+            background: #3586ff;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            flex-direction: column;
+        }
+
+        footer .social_icon,
+        footer .menu {
+            position: relative;
+            display: flex;
+            margin: 10px 0;
+        }
+
+        footer .social_icon li,
+        footer .menu li a {
+            list-style: none;
+        }
+
+        footer .social_icon li a {
+            font-size: 2em;
+            color: #fff;
+            margin: 0 10px;
+            display: inline-block;
+            text-decoration: none;
+            opacity: 0.75;
+        }
+
+        footer .social_icon li a:hover {
+            transform: translateX(-10px);
+        }
+
+        footer .menu li a:hover {
+            opacity: 1;
+        }
+
+        footer p {
+            color: #fff;
+            text-align: center;
+            margin-top: 15px;
+            margin-bottom: 1.1em;
+        }
+
+        .footer .wave {
+            position: absolute;
+            top: 0; /* Set the top to 0 for the animation to start from the top */
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: #f00 url(wave.png);
+            background-size: 1000px 100px;
+        }
+
+        footer .wave#wave1 {
+            z-index: 1000;
+            opacity: 1;
+            bottom: 0;
+            animation: animateWave 4s linear infinite;
+        }
+
+        footer .menu {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        @keyframes animateWave {
+            0% {
+                background-position-x: 1000px;
+            }
+            100% { /* Add this keyframe to complete the animation */
+                background-position-x: 0;
+            }
+        }
+
+        /* Style the menu items */
+        footer .menu li a {
+            color: white;
+            margin-right: 20px;
+        }
+
+    </style>
+</head>
+<body>
+<h1>Tic Tac Toe</h1>
+<div class="board" id="board">
+    <div class="cell" onclick="makeMove(this)"></div>
+    <div class="cell" onclick="makeMove(this)"></div>
+    <div class="cell" onclick="makeMove(this)"></div>
+    <div class="cell" onclick="makeMove(this)"></div>
+    <div class="cell" onclick="makeMove(this)"></div>
+    <div class="cell" onclick="makeMove(this)"></div>
+    <div class="cell" onclick="makeMove(this)"></div>
+    <div class="cell" onclick="makeMove(this)"></div>
+    <div class="cell" onclick="makeMove(this)"></div>
+</div>
+
+<p id="winner" style="display: none;"></p>
+<button id="resetButton" onclick="resetGame()">Reset Game</button>
+
+<script>
+    let currentPlayer = 'X';
+    let gameOver = false;
+    const board = document.getElementById('board');
+    const cells = document.querySelectorAll('.cell');
+    const winnerDisplay = document.getElementById('winner');
+
+    function makeMove(cell) {
+        if (!gameOver && cell.innerText === '') {
+            cell.innerText = currentPlayer;
+            cell.classList.add(currentPlayer);
+            checkWinner();
+            currentPlayer = (currentPlayer === 'X') ? 'O' : 'X';
+            if (!gameOver && currentPlayer === 'O') {
+                setTimeout(computerMove, 500);
+            }
+        }
+    }
+
+    function computerMove() {
+        if (!gameOver) {
+            const emptyCells = [...cells].filter(cell => cell.innerText === '');
+            const randomIndex = Math.floor(Math.random() * emptyCells.length);
+            const computerCell = emptyCells[randomIndex];
+            makeMove(computerCell);
+        }
+    }
+
+    function checkWinner() {
+        const winningCombos = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+
+        for (const combo of winningCombos) {
+            const [a, b, c] = combo;
+            if (cells[a].innerText && cells[a].innerText === cells[b].innerText && cells[a].innerText === cells[c].innerText) {
+                winnerDisplay.style.display = 'block';
+                winnerDisplay.innerText = `Player ${currentPlayer} wins!`;
+                gameOver = true;
+                return;
+            }
+        }
+
+        if ([...cells].every(cell => cell.innerText !== '')) {
+            winnerDisplay.style.display = 'block';
+            winnerDisplay.innerText = "It's a tie!";
+            gameOver = true;
+       
+        }
+
+if ([...cells].every(cell => cell.innerText !== '')) {
+    winnerDisplay.style.display = 'block';
+    winnerDisplay.innerText = "It's a tie!";
+    gameOver = true;
+}
+}
+
+function resetGame() {
+currentPlayer = 'X';
+gameOver = false;
+cells.forEach(cell => {
+    cell.innerText = '';
+    cell.classList.remove('X', 'O');
+});
+winnerDisplay.style.display = 'none';
+winnerDisplay.innerText = '';
+}
+</script>
+<footer>
+<div class="waves">
+<div class="wave" id="wave1"></div>
+<div class="wave" id="wave2"></div>
+<div class="wave" id="wave3"></div>
+<div class="wave" id="wave4"></div>
+</div>
+<ul class="social_icon">
+<li><a href="https://www.facebook.com/lewis.machabe"><ion-icon name="logo-facebook"></ion-icon></a></li>
+<li><a href="https://twitter.com/ltz_onSombi"><ion-icon name="logo-twitter"></ion-icon></a></li>
+<li><a href="https://www.linkedin.com/in/lewis-machabe/"><ion-icon name="logo-linkedin"></ion-icon></a></li>
+<li><a href="https://www.instagram.com/lewis_machabe/"><ion-icon name="logo-instagram"></ion-icon></a></li>
+<li><a href="https://www.github.com/12492sachet/"><ion-icon name="logo-github"></ion-icon></a></li>
+</ul>
+<ul class="menu">
+<li><a href="#">Home</a></li>
+<li><a href="#">About</a></li>
+<li><a href="#">Services</a></li>
+<li><a href="#">Team</a></li>
+<li><a href="#">Contact</a></li> 
+</ul>
+<p>&copy; 2023 Sachet_wizah. All Rights Reserved</p>
+</footer>
+<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</body>
+</html>
